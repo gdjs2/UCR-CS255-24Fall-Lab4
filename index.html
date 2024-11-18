@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="None">
+        
+        
+        <link rel="shortcut icon" href="img/favicon.ico">
+        <title>My Docs</title>
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/fontawesome.min.css" rel="stylesheet">
+        <link href="css/brands.min.css" rel="stylesheet">
+        <link href="css/solid.min.css" rel="stylesheet">
+        <link href="css/v4-font-face.min.css" rel="stylesheet">
+        <link href="css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body class="homepage">
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href=".">My Docs</a>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#cs202-computer-security-lab-4-adversarial-learning-24-fall" class="nav-link">CS202 - Computer Security - Lab 4 Adversarial Learning - 24 Fall</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#intro" class="nav-link">Intro</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#prerequisite" class="nav-link">Prerequisite</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#algorithms" class="nav-link">Algorithms</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#submission" class="nav-link">Submission</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#grade-policy" class="nav-link">Grade Policy</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#questions" class="nav-link">Questions</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="cs202-computer-security-lab-4-adversarial-learning-24-fall">CS202 - Computer Security - Lab 4 Adversarial Learning - 24 Fall</h1>
+<h2 id="intro">Intro</h2>
+<p>In this Lab, we would learn how to generate adversarial examples to attack machine learning models. More specifically, we will learn how to generate a set of adversarial images to deceive a CNN deep learning model to make them classify incorrecly.</p>
+<h2 id="prerequisite">Prerequisite</h2>
+<p>Even though it's not necessary, I would suggest you having a machine with nvidia GPU CUDA support, which can accelerate predicting speed. If you don't have one, you can use <a href="https://colab.research.google.com">Google Colab</a>, which provides nvidia T4 for free. </p>
+<p>We will use learning framework <code>pytorch</code> and its <code>torchvision</code> library. About how to install them locally, referring this <a href="https://pytorch.org/get-started/locally/">link</a>. Install other necessary libraries. </p>
+<p>In addition to this, you still need download two files:</p>
+<ol>
+<li><a href="https://drive.google.com/file/d/1OtEynauckSwpf7UBYNZsClo6eUQgJegq/view?usp=sharing">Testset (testset.pt)</a>, which includes 100 images and their corresponding correct labels ((input_imgs, labels)). Each image is a tensor with shape $3\times 32 \times 32$ (32 is the width and height of the image, and each pixel has 3 channels-red, green and blue). Each label is a single integer, which is the label. You need eventually made some minor perturbations to these images.</li>
+<li><a href="https://drive.google.com/file/d/1oBIgxX-oWbtWB6el-MQt4nxOBSZ6JeCt/view?usp=share_link">ResNet Network (resnet.model)</a>, which is a classification neural network. It receives an image tensor and will generate an output with size <code>1000</code>. Each term in this torch indicates the probability that this image predicted by this model is the corresponsing labels. </li>
+</ol>
+<h2 id="algorithms">Algorithms</h2>
+<p>We will introduce two adversarial training algorithms-fast gradient sign method (FGSM) and projected gradient descent (PGD). You are required to learn FGSM by yourself and generate the adversarial samples using it. PGD is optional and worth 2 bonus points. </p>
+<h4 id="fast-gradient-sign-method-10-pts">Fast Gradient Sign Method (10 pts)</h4>
+<p>Pytorch provides the tutorial about this algorithm in detail. Just follow the <a href="https://pytorch.org/tutorials/beginner/fgsm_tutorial.html">instruction</a></p>
+<p>Generally, your code will contain following parts:</p>
+<ol>
+<li>Load provided ResNet model and data set. </li>
+<li>FGSM algorithm, which receives the model, input images, desirable labels and your choice of $\epsilon$. Then return the adversarial pictures. </li>
+<li>Store the results for all 100 pictures and save them using <code>torch.save()</code></li>
+</ol>
+<p>Tips:</p>
+<p>The models and data set we provide is definitely <strong>SAFE</strong>, which means there is no executable code inside it. If you have concern, you can load them using <code>torch.load(weights_only=True)</code>. However, you need to add a lot of classes into <code>safe_globals</code> to load <code>ResNet</code> as it depends on a lot of classes. </p>
+<pre><code class="language-python"># Choose your device
+device = device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+# Load model
+model = torch.load(RESNET_MODEL_FILE, map_location=device)
+# Load dataset, set the map_location by your preference
+testset = torch.load(TESTSET_FILE, weights_only=True)
+</code></pre>
+<p>Then you can use <code>torch.utils.data.DataLoader</code> to iterate over the dataset or just simply use <code>for</code> loop in python.</p>
+<p>You can use <code>pred_result = model(input_imgs)</code> to get the prediction result. </p>
+<h4 id="projected-gradient-descent-2-pts">Projected Gradient Descent (2 pts)</h4>
+<p>You can learn the basic idea and principle from <a href="https://files.sri.inf.ethz.ch/website/teaching/riai2020/materials/lectures/LECTURE3_ATTACKS.pdf">link</a>.</p>
+<p>It's quite similar to FSGM, just in an iterative way. </p>
+<h2 id="submission">Submission</h2>
+<p>You need to store all your adversarial samples into a list. Therefore, the finally submitted object should be <code>List[torch.tensor]</code> with $\text{length}=100$, containing 100 adversarial images (the order should keep the same as the <code>testset</code>). Each tensor has the size of $3\times 32\times 32$. Persist this list using <code>torch.save(adv_imgs, SAVE_FILE)</code>. </p>
+<p>Submit your file at <a href="https://ucr-cs255-24fall-lab4.tch.gdjs2.cn"><strong>SUBMISSION SITE</strong></a>. Your result would be <strong>AUTO-GRADED</strong>. Therefore, if you submit an incorrect file, you would receive low or zero grades. Double check your file before submitting and you can also write your self-check script to test your result. </p>
+<h2 id="grade-policy">Grade Policy</h2>
+<p>Our test meets several guidelines:</p>
+<ol>
+<li>Less $\epsilon$, higher grade. If you make less perturbation to the original image, you would receive a higher grade. If you increase your $\epsilon$, your modification will then be easier to see. Your grade will drop exponentially with $\epsilon$.</li>
+<li>Higher predicted difference, higher grade. If you acheive a higher mis-prediction rate on your adversarial samples, you would receive a higher grade. Your grade will increase linearly with the mis-prediction rate.</li>
+</ol>
+<p>Specifically, we would calculate three values for your ddversarial sampls:</p>
+<ol>
+<li>$\epsilon$, which is the average difference between your submitted samples and original images (unit in pixel). In FGSM, this $\epsilon$ shoud be the same as your <code>eps</code>. In PGD, $\epsilon$ should be lower than <code>eps</code> you set in the algorithm as <code>eps</code> is the upperbound. </li>
+<li><code>tp1_accuracy_diff</code>: </li>
+<li>Top-1 accuracy is a metric used to evaluate the performance of a model. Given an image, the model outputs the probabilities for 1,000 labels. The label with the highest probability is referred to as the top-1 prediction. If this prediction matches the actual label, it is considered a True Positive. Using this, we can calculate the accuracy as $\text{tp1_acc} = \frac{TP}{100}$.</li>
+<li>We will calcualate the top-1 accuracy for both original dataset and your dataset and ise $\text{tp1_diff_original} - \text{tp1_diff_yours}$ as <code>tp1_accuracy_diff</code>. A higher Top-1 accuracy difference means that your adversarial examples make it more difficult for the model to produce correct predictions, indicating that your adversarial learning algorithm is more successful.</li>
+<li><code>tp5_accuracy_diff</code>:</li>
+<li>Top-1 accuracy is essentially the same as accuracy. It's somehow too strict. You can turn out picking the most 5 highest prediction values from the probability instead of the highest one, and if any one of them matches the desirable label, we count them as a true positive, we can get Top-5 accuracy. </li>
+<li>We would also calculate the Top-5 accuracy difference for our grading. </li>
+</ol>
+<p>We will use following formula to calculate your grades:</p>
+<p>For FGSM, you will get the score according the maximum grade you get. </p>
+<p>$$
+\text{TP1 Score} = 0.33 + 33\times \text{tp1_accuracy_diff} - e^{33\times eps}\
+\text{TP5 Score} = 66\times \text{tp1_accuracy_diff} - e^{33\times eps}\
+\text{Final Score} = \text{min}(\text{max}(\text{max}(\text{TP1 Score}, \text{TP5 Score}), 0), 10)
+$$</p>
+<p>For PGD, you will get the score according to the minimum grade you get.</p>
+<p>$$
+\text{TP1 Score} = 26\times \text{tp1_accuracy_diff} - e^{66\times eps}\
+\text{TP5 Score} = 46\times \text{tp1_accuracy_diff} - e^{66\times eps}\
+\text{Final Score} = \text{min}(\text{max}(\text{min}(\text{TP1 Score}, \text{TP5 Score}), 0), 2)
+$$</p>
+<p>PGD algorithm is more powerful and you can see it's more strict to $\epsilon$. </p>
+<p>You can submit for FGSM for <strong>10 TIMES</strong> amd <strong>3 TIMES</strong> for PGD. Test by yourself before submitting. GLHF!</p>
+<h2 id="questions">Questions</h2>
+<p>Contacting me via <a href="mailto:zxiao033@ucr.edu">email</a> if you have any question. Attach your email, name and corresponding submission id. </p>
+<p><strong>BONUS:</strong> Because this is a security course and you have learned about web security. If you can find any vulnerabilty in this website, we can give you some bonus for the lab :). </p>
+<p>Good luck, have fun!</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = ".",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="js/base.js"></script>
+        <script src="search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
+
+<!--
+MkDocs version : 1.6.1
+Build Date UTC : 2024-11-18 21:48:35.009162+00:00
+-->
