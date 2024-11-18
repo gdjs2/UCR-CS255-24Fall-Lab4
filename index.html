@@ -151,7 +151,7 @@ $$</p>
 <p>$$
 \text{TP1 Score} = 26\times \text{tp1_accuracy_diff} - e^{66\times eps}\
 \text{TP5 Score} = 46\times \text{tp1_accuracy_diff} - e^{66\times eps}\
-\text{Final Score} = \text{min}(\text{max}(\text{min}(\text{TP1 Score}, \text{TP5 Score}), 0), 2)
+\text{Final Score} = 0.2\times \text{min}(\text{max}(\text{min}(\text{TP1 Score}, \text{TP5 Score}), 0), 10)
 $$</p>
 <p>PGD algorithm is more powerful and you can see it's more strict to $\epsilon$. </p>
 <p>You can submit for FGSM for <strong>10 TIMES</strong> amd <strong>3 TIMES</strong> for PGD. Test by yourself before submitting. GLHF!</p>
@@ -240,5 +240,5 @@ $$</p>
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2024-11-18 21:48:35.009162+00:00
+Build Date UTC : 2024-11-18 21:49:45.290129+00:00
 -->
