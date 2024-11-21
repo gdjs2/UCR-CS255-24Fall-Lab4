@@ -101,6 +101,6 @@ You can submit for FGSM for **10 TIMES** amd **3 TIMES** for PGD. Test by yourse
 
 Contacting me via [email](mailto:zxiao033@ucr.edu) if you have any question. Attach your email, name and corresponding submission id. 
 
-**BONUS:** Because this is a security course and you have learned about web security. If you can find any vulnerabilty in this website, we can give you some bonus for the lab :). 
+**BONUS:** Because this is a security course and you have learned about web security. If you can find any vulnerabilty in the submission website (this tutorial is a purely static website), we can give you some bonus for the lab :). 
 
 Good luck, have fun!
